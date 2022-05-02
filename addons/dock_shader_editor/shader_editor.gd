@@ -3,8 +3,8 @@ extends EditorPlugin
 
 var panel_instance
 
-onready var dock = get_node("/root/EditorNode/@@592/@@593/@@601/@@603/@@607/@@611/@@612/@@613/@@4742/@@4743")
-onready var shader_editor = get_node("/root/EditorNode/@@592/@@593/@@601/@@603/@@607/@@611/@@612/@@613/@@4742/@@4743/@@7844")
+var dock
+var shader_editor
 
 func get_plugin_name():
 	return "Shader"
@@ -23,6 +23,9 @@ func _enter_tree():
 	make_visible(true)
 	panel_instance.size_flags_vertical = 3
 	panel_instance.size_flags_horizontal = 3
+	
+	shader_editor = find_editor(get_editor_interface().get_base_control(), 0)
+	dock = shader_editor.get_parent()
 
 	for child in shader_editor.get_children():
 		shader_editor.remove_child(child)
@@ -62,3 +65,15 @@ func get_theme(control):
 		if theme != null: break
 		control = control.get_parent()
 	return theme
+
+func find_editor(node, recursive_level):
+	if node.get_class() == "ShaderEditor":
+		return node
+	else:
+		recursive_level += 1
+		if recursive_level > 20:
+			return null
+		for child in node.get_children():
+			var result = find_editor(child, recursive_level)
+			if result != null:
+				return result
